@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import Board from './Board';
+import AnalyticsTab from './AnalyticsTab';
+import HomeTab from './HomeTab';
 import './App.css';
 
 class App extends Component {
@@ -9,6 +11,52 @@ class App extends Component {
       selectedTab: 'shipping-requests',
       searchQuery: '',
     };
+  }
+
+  renderTabContent() {
+    switch (this.state.selectedTab) {
+      case 'home':
+        return (
+          <div className="bg-white p-8 rounded-xl border border-[#c6c6cd] shadow-sm">
+            <h2 className="text-2xl font-bold text-[#0b1c30] mb-2">Welcome to Shiptivitas</h2>
+            <p className="text-sm text-[#45464d]">
+              Manage shipping requests, track task priorities, and analyze team productivity.
+            </p>
+          </div>
+        );
+      case 'analytics':
+        return <AnalyticsTab />;
+      case 'shipping-requests':
+      default:
+        return (
+          <>
+            {/* Page heading */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-[#0b1c30]">Shipping Requests</h2>
+                <p className="text-sm text-[#45464d] mt-1">Manage incoming shipping requests using Kanban workflow.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <ActionBtn icon="filter_list" label="Filter" />
+                <ActionBtn icon="sort" label="Sort" />
+                <ActionBtn icon="file_download" label="Export" />
+              </div>
+            </div>
+
+            {/* KPI Widgets */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <KpiCard icon="all_inbox"      label="Total Requests"  value="1,284" badge="+12% vs LY"  badgeColor="green" />
+              <KpiCard icon="check_circle"   label="Completed Today" value="42"    badge="On Track"   badgeColor="green" />
+              <KpiCard icon="pending"        label="In Progress"     value="156"   badge="Active"     badgeColor="blue"  />
+              <KpiCard icon="hourglass_empty"label="Backlog"         value="89"    badge="Critical"   badgeColor="red"   />
+              <KpiCard icon="trending_up"    label="Completion Rate" value="94.2%" progress={94}      badgeColor="none"  />
+            </div>
+
+            {/* Kanban Board */}
+            <Board searchQuery={this.state.searchQuery} />
+          </>
+        );
+    }
   }
 
   render() {
@@ -31,14 +79,14 @@ class App extends Component {
           {/* Nav items */}
           <div className="flex-1 px-4 space-y-1 overflow-y-auto">
             <NavItem icon="dashboard" label="Dashboard"
-              active={false}
+              active={this.state.selectedTab === 'home'}
               onClick={() => this.setState({ selectedTab: 'home' })} />
             <NavItem icon="local_shipping" label="Shipping Requests"
               active={this.state.selectedTab === 'shipping-requests'}
               onClick={() => this.setState({ selectedTab: 'shipping-requests' })} />
             <NavItem icon="analytics" label="Analytics"
-              active={false}
-              onClick={() => {}} />
+              active={this.state.selectedTab === 'analytics'}
+              onClick={() => this.setState({ selectedTab: 'analytics' })} />
             <NavItem icon="archive" label="Archive"
               active={false}
               onClick={() => {}} />
@@ -92,30 +140,7 @@ class App extends Component {
 
           {/* ── Page content ── */}
           <main className="flex-1 p-8 space-y-6">
-            {/* Page heading */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-[#0b1c30]">Shipping Requests</h2>
-                <p className="text-sm text-[#45464d] mt-1">Manage incoming shipping requests using Kanban workflow.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <ActionBtn icon="filter_list" label="Filter" />
-                <ActionBtn icon="sort" label="Sort" />
-                <ActionBtn icon="file_download" label="Export" />
-              </div>
-            </div>
-
-            {/* ── KPI Widgets ── */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <KpiCard icon="all_inbox"      label="Total Requests"  value="1,284" badge="+12% vs LY"  badgeColor="green" />
-              <KpiCard icon="check_circle"   label="Completed Today" value="42"    badge="On Track"   badgeColor="green" />
-              <KpiCard icon="pending"        label="In Progress"     value="156"   badge="Active"     badgeColor="blue"  />
-              <KpiCard icon="hourglass_empty"label="Backlog"         value="89"    badge="Critical"   badgeColor="red"   />
-              <KpiCard icon="trending_up"    label="Completion Rate" value="94.2%" progress={94}      badgeColor="none"  />
-            </div>
-
-            {/* ── Kanban Board ── */}
-            <Board searchQuery={this.state.searchQuery} />
+            {this.renderTabContent()}
           </main>
         </div>
 
