@@ -32,9 +32,9 @@ let clients = [
   { id: '20', name: 'Murphy, Lang and Ferry',              description: 'Organized Explicit Access',                           status: 'backlog' },
 ];
 
-// Health Check API
+// Health Check API for Render
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date(), service: 'Shiptivitas Backend' });
+  res.json({ status: 'ok', timestamp: new Date(), service: 'Shiptivitas Fullstack API' });
 });
 
 // GET all shipping requests
@@ -58,7 +58,7 @@ app.post('/api/clients', (req, res) => {
   res.status(201).json(newClient);
 });
 
-// PUT update a shipping request (status or position)
+// PUT update a shipping request (status or details)
 app.put('/api/clients/:id', (req, res) => {
   const { id } = req.params;
   const { status, name, description } = req.body;
@@ -85,7 +85,7 @@ app.delete('/api/clients/:id', (req, res) => {
 // Serve React static build in production
 if (process.env.NODE_ENV === 'production' || process.env.SERVE_BUILD === 'true') {
   app.use(express.static(path.join(__dirname, 'build')));
-  app.get('*', (req, res) => {
+  app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
   });
 }
