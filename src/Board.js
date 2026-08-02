@@ -35,7 +35,7 @@ export default class Board extends React.Component {
       ['8',  'Schumm-Labadie',                    'Operative Heuristic Challenge',                       'backlog'],
       ['9',  'Kohler Group',                      'Re-Contextualized Multi-Tasking Attitude',            'backlog'],
       ['10', 'Romaguera Inc',                     'Managed Foreground Toolset',                          'backlog'],
-      ['11', 'Reilly-King',                       'Future-Proofed Interactive Toolset',                  'complete'],
+      ['11', 'Reilly-King',                         'Future-Proofed Interactive Toolset',                  'complete'],
       ['12', 'Emard, Champlin and Runolfsdottir', 'Devolved Needs-Based Capability',                     'backlog'],
       ['13', 'Fritsch, Cronin and Wolff',         'Open-Source 3Rdgeneration Website',                   'complete'],
       ['14', 'Borer LLC',                         'Profit-Focused Incremental Orchestration',            'backlog'],
@@ -64,28 +64,62 @@ export default class Board extends React.Component {
       const res = await fetch(`${API_BASE_URL}/api/v1/clients`);
       if (res.ok) {
         const data = await res.json();
-        this.setState({
-          clients: {
-            backlog:    data.filter(c => !c.status || c.status === 'backlog'),
-            inProgress: data.filter(c => c.status === 'in-progress'),
-            complete:   data.filter(c => c.status === 'complete'),
-          }
-        });
+        if (Array.isArray(data) && data.length > 0) {
+          this.setState({
+            clients: {
+              backlog:    data.filter(c => !c.status || c.status === 'backlog'),
+              inProgress: data.filter(c => c.status === 'in-progress'),
+              complete:   data.filter(c => c.status === 'complete'),
+            }
+          });
+          return;
+        }
       }
     } catch (e) {
-      console.warn('Backend API unavailable, using local store.', e);
+      console.log('Task 2 standalone backend unavailable, trying local fullstack endpoint...');
+    }
+
+    try {
+      const res = await fetch(`/api/clients`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          this.setState({
+            clients: {
+              backlog:    data.filter(c => !c.status || c.status === 'backlog'),
+              inProgress: data.filter(c => c.status === 'in-progress'),
+              complete:   data.filter(c => c.status === 'complete'),
+            }
+          });
+        }
+      }
+    } catch (err) {
+      // Gracefully retains clients from constructor state
     }
   }
 
   async updateBackendClient(cardId, newStatus, priority) {
+    // 1. Try Task 2 API (http://localhost:3001/api/v1/clients/:id)
     try {
-      await fetch(`${API_BASE_URL}/api/v1/clients/${cardId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/clients/${cardId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus, priority })
+      });
+      if (res.ok) return;
+    } catch (e) {
+      // Fallback
+    }
+
+    // 2. Try relative endpoint (/api/clients/:id)
+    try {
+      await fetch(`/api/clients/${cardId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus, priority })
       });
     } catch (e) {
-      console.warn('Failed to update client on backend API', e);
+      // Fallback
     }
   }
 
