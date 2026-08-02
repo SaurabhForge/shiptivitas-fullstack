@@ -1,0 +1,496 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shiptivitas | Shipping Requests Dashboard</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Dragula for Kanban functionality -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#3f465c",
+                        "background": "#f8f9ff",
+                        "primary": "#000000",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d8e2ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#fefcff",
+                        "surface-container": "#e5eeff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#131b2e",
+                        "on-surface-variant": "#45464d",
+                        "primary-fixed-dim": "#bec6e0",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-tint": "#565e74",
+                        "secondary": "#0058be",
+                        "on-surface": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "outline": "#76777d",
+                        "on-tertiary-fixed": "#002113",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-primary-container": "#7c839b",
+                        "primary-fixed": "#dae2fd",
+                        "inverse-surface": "#213145",
+                        "tertiary-container": "#002113",
+                        "on-secondary-fixed-variant": "#004395",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#001a42",
+                        "tertiary": "#000000",
+                        "on-background": "#0b1c30",
+                        "outline-variant": "#c6c6cd",
+                        "surface-container-highest": "#d3e4fe",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "primary-container": "#131b2e",
+                        "secondary-container": "#2170e4",
+                        "inverse-primary": "#bec6e0",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary-container": "#009668",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-low": "#eff4ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#d3e4fe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "margin-desktop": "32px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .gu-mirror {
+            position: fixed !important;
+            margin: 0 !important;
+            z-index: 9999 !important;
+            opacity: 0.8;
+            transform: rotate(3deg) scale(1.05);
+            transition: transform 0.15s ease;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+        .gu-transit { opacity: 0.2; }
+        .swimlane-column {
+            min-height: 200px;
+            scrollbar-width: none;
+        }
+        .swimlane-column::-webkit-scrollbar { display: none; }
+        
+        /* Custom card themes per lane */
+        [data-lane="Backlog"] .request-card { background-color: white; border-left: 4px solid #cbd5e1; }
+        [data-lane="In Progress"] .request-card { background-color: #f0f7ff; border-left: 4px solid #3b82f6; }
+        [data-lane="Completed"] .request-card { background-color: #f0fdf4; border-left: 4px solid #22c55e; }
+        
+        .dark [data-lane="Backlog"] .request-card { background-color: #1e293b; border-left: 4px solid #475569; }
+        .dark [data-lane="In Progress"] .request-card { background-color: #0f172a; border-left: 4px solid #2563eb; }
+        .dark [data-lane="Completed"] .request-card { background-color: #064e3b; border-left: 4px solid #059669; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- SideNavBar (from JSON) -->
+<nav class="fixed left-0 top-0 h-full border-r border-outline-variant dark:border-outline w-[240px] h-screen flex flex-col bg-surface dark:bg-inverse-surface z-50">
+<div class="p-lg flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+</div>
+<div>
+<h1 class="font-display text-headline-sm font-bold text-on-surface dark:text-inverse-on-surface leading-tight">Shiptivitas</h1>
+<p class="font-label-md text-label-sm text-on-surface-variant opacity-70">Productivity Platform</p>
+</div>
+</div>
+<div class="flex-1 px-md mt-sm overflow-y-auto space-y-xs">
+<!-- Dashboard Item -->
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-on-primary-fixed-variant transition-colors duration-200 rounded-lg group active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<!-- Shipping Requests - ACTIVE -->
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-lg font-bold group active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+<span class="font-label-md">Shipping Requests</span>
+</a>
+<!-- Analytics -->
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-on-primary-fixed-variant transition-colors duration-200 rounded-lg group active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md">Analytics</span>
+</a>
+<!-- Archive -->
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-on-primary-fixed-variant transition-colors duration-200 rounded-lg group active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-on-primary-fixed-variant transition-colors duration-200 rounded-lg group active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md">Settings</span>
+</a>
+</div>
+<div class="p-md border-t border-outline-variant dark:border-outline">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-on-primary-fixed-variant transition-colors duration-200 rounded-lg active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-label-md">User Profile</span>
+</a>
+</div>
+</nav>
+<!-- TopNavBar (from JSON) -->
+<header class="flex justify-between items-center px-lg h-16 sticky top-0 z-40 ml-[240px] max-w-[calc(100%-240px)] w-full bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline shadow-sm">
+<div class="flex items-center gap-lg flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-label-md focus:ring-2 focus:ring-secondary/20 transition-all" placeholder="Search shipments..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary px-lg py-2 rounded-lg font-label-md font-bold hover:opacity-90 active:scale-98 transition-all">
+                + New Request
+            </button>
+<div class="flex items-center gap-xs px-sm border-l border-outline-variant ml-sm">
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors relative">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help">help</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female logistics manager with a confident expression, wearing a sleek navy blazer, set against a blurred modern office background with soft daylighting and a high-end corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM15u7O4MpP4N18aCRZFyeNvozDT5prR3gK4h1iZdbfgvx_nyiLowBtp2BD6QokT3NCOFQVcEREpPwArcl2DzAzy9uPDTSe6rISUvrHx89IQUUC741jBWlzlaOWu38JB0ZboqOKE2eX6FR0Ucqhx_H6CX8-wSGD40QDyyBChiWSfEg7Kg5ydFekBSjHgXtYCNLj1A56pCpZsCrOuKDSNCWwgybwwUbe759abdV2z_lIDpUldLvJ-zbpA"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[240px] p-lg pt-8 space-y-xl">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="font-display text-headline-lg text-on-surface">Shipping Requests</h2>
+<p class="font-body-md text-on-surface-variant mt-xs">Manage incoming shipping requests using Kanban workflow.</p>
+</div>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-2 border border-outline-variant rounded-lg font-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span> Filter
+                </button>
+<button class="flex items-center gap-xs px-md py-2 border border-outline-variant rounded-lg font-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="sort">sort</span> Sort
+                </button>
+<button class="flex items-center gap-xs px-md py-2 border border-outline-variant rounded-lg font-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="file_download">file_download</span> Export
+                </button>
+</div>
+</div>
+<!-- KPI Widgets (Bento-lite) -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-md">
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between group hover:border-secondary transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm uppercase tracking-wider text-on-surface-variant opacity-60">Total Requests</span>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors" data-icon="all_inbox">all_inbox</span>
+</div>
+<div class="mt-sm">
+<h4 class="font-display text-headline-md text-on-surface">1,284</h4>
+<span class="inline-flex items-center text-[10px] text-tertiary-container font-bold bg-tertiary-fixed-dim/20 px-1.5 py-0.5 rounded mt-1">
+                        +12% vs LY
+                    </span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between group hover:border-secondary transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm uppercase tracking-wider text-on-surface-variant opacity-60">Completed Today</span>
+<span class="material-symbols-outlined text-outline group-hover:text-tertiary-container transition-colors" data-icon="check_circle">check_circle</span>
+</div>
+<div class="mt-sm">
+<h4 class="font-display text-headline-md text-on-surface">42</h4>
+<span class="inline-flex items-center text-[10px] text-on-tertiary-container font-bold bg-tertiary-fixed/40 px-1.5 py-0.5 rounded mt-1">
+                        On Track
+                    </span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between group hover:border-secondary transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm uppercase tracking-wider text-on-surface-variant opacity-60">In Progress</span>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors" data-icon="pending">pending</span>
+</div>
+<div class="mt-sm">
+<h4 class="font-display text-headline-md text-on-surface">156</h4>
+<span class="inline-flex items-center text-[10px] text-on-secondary-fixed-variant font-bold bg-secondary-fixed/40 px-1.5 py-0.5 rounded mt-1">
+                        Active
+                    </span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between group hover:border-secondary transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm uppercase tracking-wider text-on-surface-variant opacity-60">Backlog</span>
+<span class="material-symbols-outlined text-outline group-hover:text-error transition-colors" data-icon="hourglass_empty">hourglass_empty</span>
+</div>
+<div class="mt-sm">
+<h4 class="font-display text-headline-md text-on-surface">89</h4>
+<span class="inline-flex items-center text-[10px] text-on-error-container font-bold bg-error-container px-1.5 py-0.5 rounded mt-1">
+                        Critical
+                    </span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between group hover:border-secondary transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm uppercase tracking-wider text-on-surface-variant opacity-60">Completion Rate</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="trending_up">trending_up</span>
+</div>
+<div class="mt-sm">
+<h4 class="font-display text-headline-md text-on-surface">94.2%</h4>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-secondary h-full" style="width: 94%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Kanban Board -->
+<div class="flex gap-lg overflow-x-auto pb-lg snap-x">
+<!-- Backlog Lane -->
+<div class="flex-shrink-0 w-[350px] bg-surface-container-low rounded-xl flex flex-col p-md snap-start" data-lane="Backlog">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<h3 class="font-headline-sm text-on-surface">Backlog</h3>
+<span class="bg-outline-variant text-on-surface-variant text-[12px] px-2 py-0.5 rounded-full font-bold">14</span>
+</div>
+<button class="p-1 hover:bg-surface-container transition-colors rounded">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<div class="swimlane-column flex-1 space-y-md overflow-y-auto max-h-[calc(100vh-450px)]" id="backlog-cards">
+<!-- Card 1 -->
+<div class="request-card p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-grab active:cursor-grabbing bg-surface-container-lowest">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-[11px] font-bold text-outline uppercase tracking-wider">SHP-4829</span>
+<span class="bg-error-container text-on-error-container text-[10px] px-1.5 py-0.5 rounded font-bold">HIGH</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-xs leading-snug">Global Tech Equipment</h4>
+<p class="font-body-sm text-on-surface-variant line-clamp-2 mb-md">Express fragile delivery of 50 high-end monitors and workstations for the new hub.</p>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-surface overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a professional worker with glasses and a warm smile, wearing a casual grey shirt, lit with soft natural light in a modern workspace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1Lxuoih-CjdhBmDg3l0mkrLfY72S_dofaaUUZnnmXPGXHpWpIKqyDPsx-tC1Hy0URCNW9vRANQwOc0cx6WDZTcXQ57pbl1R5YyZrXg9nc7TZ4R6Q-Eq3oSuc9suPG7uEk8gkhOx_2fQ5AnbkHLYpTFf34AZivkwg-RqB1Fzt-21KeOfBJpibkQpgp9BDGtP32-NNi3th2PmxmDu9Yo1KZ-lkom6wVDkpY7INupdLPjOe15CjYEDLQ1Q"/>
+</div>
+</div>
+<div class="flex items-center gap-xs text-[12px] text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="calendar_month">calendar_month</span>
+                                Oct 24
+                            </div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="request-card p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-grab active:cursor-grabbing bg-surface-container-lowest">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-[11px] font-bold text-outline uppercase tracking-wider">SHP-4835</span>
+<span class="bg-surface-variant text-on-surface-variant text-[10px] px-1.5 py-0.5 rounded font-bold">MED</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-xs leading-snug">Retail Inventory Restock</h4>
+<p class="font-body-sm text-on-surface-variant line-clamp-2 mb-md">Quarterly restock for San Francisco and Seattle flagship stores.</p>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex items-center gap-xs text-secondary font-bold text-[10px] bg-secondary-fixed px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[12px]" data-icon="local_shipping">local_shipping</span> Ground
+                            </div>
+<div class="flex items-center gap-xs text-[12px] text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-[14px]" data-icon="calendar_month">calendar_month</span>
+                                Nov 02
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- In Progress Lane -->
+<div class="flex-shrink-0 w-[350px] bg-surface-container-low rounded-xl flex flex-col p-md snap-start" data-lane="In Progress">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<h3 class="font-headline-sm text-on-surface">In Progress</h3>
+<span class="bg-secondary-container text-on-secondary-container text-[12px] px-2 py-0.5 rounded-full font-bold">8</span>
+</div>
+<button class="p-1 hover:bg-surface-container transition-colors rounded">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<div class="swimlane-column flex-1 space-y-md overflow-y-auto max-h-[calc(100vh-450px)]" id="progress-cards">
+<!-- Card 3 -->
+<div class="request-card p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-grab active:cursor-grabbing bg-surface-container-lowest">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-[11px] font-bold text-outline uppercase tracking-wider">SHP-4102</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant text-[10px] px-1.5 py-0.5 rounded font-bold">MED</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-xs leading-snug">Austin Data Center Parts</h4>
+<div class="flex items-center gap-2 mb-md">
+<span class="text-[10px] px-1.5 py-0.5 bg-surface-container text-on-surface-variant rounded">Origin: CHI</span>
+<span class="material-symbols-outlined text-[12px] text-outline" data-icon="arrow_forward">arrow_forward</span>
+<span class="text-[10px] px-1.5 py-0.5 bg-surface-container text-on-surface-variant rounded">Dest: AUS</span>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-surface overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a male professional with a short beard and stylish haircut, wearing a black polo shirt, against a minimalist industrial backdrop with blue accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3e88ZJIcFHypgZR9Fh4wsaMrLCduIn5LvTRpn25pmnvheyssiGwxz5hsa9tqcb9a-Nrd1EPbl8fckBP2-43mOhxjbWWEOE--f623LXiCm7UFz3aeYttCQvx205LRuyIDJMEjXaf_uC3XxXgP5MKHW21O1z19WcPGBW1eur6jTTICVUcAS5UuMRQCbAGQ7jbaDfr7DokLsSVazTqgXkc1MWljUWbbEJo68cJ8AYK6KiktJWYE6QAI1oA"/>
+</div>
+</div>
+<div class="flex items-center gap-xs text-[12px] text-secondary font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="navigation">navigation</span>
+                                In Transit
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Completed Lane -->
+<div class="flex-shrink-0 w-[350px] bg-surface-container-low rounded-xl flex flex-col p-md snap-start" data-lane="Completed">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<h3 class="font-headline-sm text-on-surface">Completed</h3>
+<span class="bg-tertiary-fixed-dim/40 text-on-tertiary-fixed-variant text-[12px] px-2 py-0.5 rounded-full font-bold">112</span>
+</div>
+<button class="p-1 hover:bg-surface-container transition-colors rounded">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<div class="swimlane-column flex-1 space-y-md overflow-y-auto max-h-[calc(100vh-450px)]" id="completed-cards">
+<!-- Card 4 -->
+<div class="request-card p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-grab active:cursor-grabbing bg-surface-container-lowest">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-[11px] font-bold text-outline uppercase tracking-wider">SHP-3981</span>
+<span class="bg-tertiary-fixed-dim/20 text-on-tertiary-fixed-variant text-[10px] px-1.5 py-0.5 rounded font-bold">LOW</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-xs leading-snug">New York HQ Supplies</h4>
+<p class="font-body-sm text-on-surface-variant line-clamp-1 mb-md">Standard office supplies replenishment for Manhattan offices.</p>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex items-center gap-sm text-[12px] text-on-tertiary-container font-bold">
+<span class="material-symbols-outlined text-[16px]" data-icon="task_alt">task_alt</span>
+                                Delivered
+                            </div>
+<div class="text-[10px] text-outline font-medium">Oct 20, 2023</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty State / Add Column -->
+<button class="flex-shrink-0 w-[80px] bg-surface-container-low/50 border-2 border-dashed border-outline-variant rounded-xl flex items-center justify-center hover:bg-surface-container hover:border-secondary transition-all group">
+<span class="material-symbols-outlined text-outline group-hover:text-secondary text-headline-md" data-icon="add_circle">add_circle</span>
+</button>
+</div>
+</main>
+<!-- Footer-fixed elements (FAB and such) -->
+<div class="fixed bottom-lg right-lg z-50">
+<button class="flex items-center gap-sm bg-primary text-on-primary px-xl py-4 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all group">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+<span class="font-label-md font-bold max-w-0 group-hover:max-w-xs overflow-hidden whitespace-nowrap transition-all duration-300">New Request</span>
+</button>
+</div>
+<!-- Drag & Drop Implementation -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const drake = dragula([
+                document.querySelector('#backlog-cards'),
+                document.querySelector('#progress-cards'),
+                document.querySelector('#completed-cards')
+            ], {
+                mirrorContainer: document.body,
+                moves: (el, container, handle) => {
+                    return true; // Any element inside columns can move
+                }
+            });
+
+            drake.on('drop', (el, target, source) => {
+                // Update specific card properties based on target lane
+                const targetLane = target.parentElement.getAttribute('data-lane');
+                console.log(`Moved item to ${targetLane}`);
+                
+                // You could add dynamic status badge updates here
+                const statusArea = el.querySelector('.status-indicator');
+                if (statusArea) {
+                    if (targetLane === 'Completed') {
+                        statusArea.innerHTML = '<span class="material-symbols-outlined text-[16px]" data-icon="task_alt">task_alt</span> Delivered';
+                        statusArea.className = "flex items-center gap-sm text-[12px] text-on-tertiary-container font-bold";
+                    } else if (targetLane === 'In Progress') {
+                        statusArea.innerHTML = '<span class="material-symbols-outlined text-[14px]" data-icon="navigation">navigation</span> In Transit';
+                        statusArea.className = "flex items-center gap-xs text-[12px] text-secondary font-bold";
+                    }
+                }
+                
+                // Trigger a "success" micro-animation
+                el.classList.add('ring-2', 'ring-secondary/30');
+                setTimeout(() => {
+                    el.classList.remove('ring-2', 'ring-secondary/30');
+                }, 500);
+            });
+
+            // Mobile-first responsive touch support usually needs extra handling, 
+            // but Dragula handles many touch events natively.
+        });
+
+        // Simple Search Filter
+        const searchInput = document.querySelector('input[placeholder="Search shipments..."]');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.request-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body></html>
+
+
