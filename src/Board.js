@@ -3,7 +3,7 @@ import Dragula from 'dragula';
 import 'dragula/dist/dragula.css';
 import Swimlane from './Swimlane';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 export default class Board extends React.Component {
   constructor(props) {
@@ -61,7 +61,7 @@ export default class Board extends React.Component {
 
   async fetchClientsFromBackend() {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/clients`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/clients`);
       if (res.ok) {
         const data = await res.json();
         this.setState({
@@ -73,19 +73,19 @@ export default class Board extends React.Component {
         });
       }
     } catch (e) {
-      console.warn('Backend API unavailable, using local client store.', e);
+      console.warn('Backend API unavailable, using local store.', e);
     }
   }
 
-  async updateBackendStatus(cardId, newStatus) {
+  async updateBackendClient(cardId, newStatus, priority) {
     try {
-      await fetch(`${API_BASE_URL}/api/clients/${cardId}`, {
+      await fetch(`${API_BASE_URL}/api/v1/clients/${cardId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, priority })
       });
     } catch (e) {
-      console.warn('Failed to sync status update with backend', e);
+      console.warn('Failed to update client on backend API', e);
     }
   }
 
@@ -104,9 +104,16 @@ export default class Board extends React.Component {
       const tgtKey    = this.getLaneKey(target);
       if (!srcKey || !tgtKey) return;
 
+      const children = Array.from(target.children);
+      const newIndex = children.indexOf(el);
+      const newPriority = newIndex !== -1 ? newIndex + 1 : 1;
+
       if (srcKey === tgtKey) {
-        // Same lane reorder — sync state to new DOM order
-        const newOrder = Array.from(target.children).map(n => n.getAttribute('data-id'));
+        // Same lane reorder
+        const newStatus = this.getStatusForKey(tgtKey);
+        this.updateBackendClient(cardId, newStatus, newPriority);
+
+        const newOrder = children.map(n => n.getAttribute('data-id'));
         this.setState(prev => ({
           clients: {
             ...prev.clients,
@@ -114,12 +121,11 @@ export default class Board extends React.Component {
           },
         }));
       } else {
-        // Cross-lane move — cancel DOM change, let React re-render with new status
+        // Cross-lane move
         drake.cancel(true);
         const newStatus = this.getStatusForKey(tgtKey);
-        
-        // Sync with backend API
-        this.updateBackendStatus(cardId, newStatus);
+
+        this.updateBackendClient(cardId, newStatus, newPriority);
 
         this.setState(prev => {
           const srcList = prev.clients[srcKey];
